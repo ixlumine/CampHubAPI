@@ -1,0 +1,36 @@
+services:
+  db:
+    image: mysql:9.7
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_dev_password}
+      MYSQL_DATABASE: camphub_db
+      MYSQL_USER: ${DB_USERNAME:-camphub_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-camphub_dev_password}
+    ports:
+      - "127.0.0.1:${DB_PORT:-3306}:3306"
+    volumes:
+      - camphub_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  api:
+    build: .
+    environment:
+      SERVER_ADDRESS: 0.0.0.0
+      DB_HOST: db
+      DB_USERNAME: ${DB_USERNAME:-camphub_user}
+      DB_PASSWORD: ${DB_PASSWORD:-camphub_dev_password}
+      JWT_SECRET: ${JWT_SECRET:-ganti-dengan-string-acak-minimal-32-karakter}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin_dev_password}
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  camphub_data:
