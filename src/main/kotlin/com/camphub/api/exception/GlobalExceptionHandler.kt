@@ -12,6 +12,10 @@ import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.web.HttpRequestMethodNotSupportedException
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+import org.springframework.web.servlet.resource.NoResourceFoundException
 
 /**
  * Format response error yang konsisten untuk seluruh endpoint.
@@ -107,6 +111,39 @@ class GlobalExceptionHandler {
             details = errors
         )
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body)
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun handleNotReadable(
+        ex: HttpMessageNotReadableException,
+        req: HttpServletRequest
+    ): ResponseEntity<ApiErrorResponse> {
+        log.warn("BAD REQUEST BODY [{} {}] - {}", req.method, req.requestURI, ex.mostSpecificCause.message)
+        return build(HttpStatus.BAD_REQUEST, "Format data tidak valid", req)
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException::class)
+    fun handleTypeMismatch(
+        ex: MethodArgumentTypeMismatchException,
+        req: HttpServletRequest
+    ): ResponseEntity<ApiErrorResponse> {
+        log.warn("TYPE MISMATCH [{} {}] - {}", req.method, req.requestURI, ex.message)
+        return build(HttpStatus.BAD_REQUEST, "Parameter ${ex.name} tidak valid", req)
+    }
+
+    @ExceptionHandler(NoResourceFoundException::class)
+    fun handleNoResource(ex: NoResourceFoundException, req: HttpServletRequest): ResponseEntity<ApiErrorResponse> {
+        log.warn("NO ENDPOINT [{} {}]", req.method, req.requestURI)
+        return build(HttpStatus.NOT_FOUND, "Endpoint tidak ditemukan", req)
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
+    fun handleMethodNotSupported(
+        ex: HttpRequestMethodNotSupportedException,
+        req: HttpServletRequest
+    ): ResponseEntity<ApiErrorResponse> {
+        log.warn("METHOD NOT ALLOWED [{} {}]", req.method, req.requestURI)
+        return build(HttpStatus.METHOD_NOT_ALLOWED, "Method tidak didukung", req)
     }
 
     @ExceptionHandler(Exception::class)
