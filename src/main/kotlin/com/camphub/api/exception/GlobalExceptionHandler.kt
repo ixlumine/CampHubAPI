@@ -113,6 +113,7 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body)
     }
 
+    // Broken JSON or wrong field type → 400
     @ExceptionHandler(HttpMessageNotReadableException::class)
     fun handleNotReadable(
         ex: HttpMessageNotReadableException,
@@ -122,6 +123,7 @@ class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "Format data tidak valid", req)
     }
 
+    // Wrong type in path or query → 400
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
     fun handleTypeMismatch(
         ex: MethodArgumentTypeMismatchException,
@@ -131,12 +133,14 @@ class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "Parameter ${ex.name} tidak valid", req)
     }
 
+    // Unknown endpoint → 404
     @ExceptionHandler(NoResourceFoundException::class)
     fun handleNoResource(ex: NoResourceFoundException, req: HttpServletRequest): ResponseEntity<ApiErrorResponse> {
         log.warn("NO ENDPOINT [{} {}]", req.method, req.requestURI)
         return build(HttpStatus.NOT_FOUND, "Endpoint tidak ditemukan", req)
     }
 
+    // Wrong HTTP method → 405
     @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
     fun handleMethodNotSupported(
         ex: HttpRequestMethodNotSupportedException,

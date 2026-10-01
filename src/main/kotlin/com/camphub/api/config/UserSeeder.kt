@@ -24,6 +24,7 @@ class UserSeeder(
         if (userRepository.count() != 0L) return
 
         val samplePassword = "password123"
+        // Keep this order; other seeders pick accounts by position
         val users = listOf(
             newUser("Admin CampHub", "admin@example.com", adminPassword, Role.ADMIN),
             newUser("Kode Nusantara", "kodenusantara@example.com", samplePassword, Role.PROVIDER),

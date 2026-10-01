@@ -2,6 +2,7 @@ package com.camphub.api.dto
 
 import jakarta.validation.constraints.*
 
+// Request DTO
 data class RegisterRequest(
     @field:NotBlank(message = "Nama tidak boleh kosong")
     @field:Size(min = 2, max = 100, message = "Nama harus 2–100 karakter")
@@ -17,6 +18,7 @@ data class RegisterRequest(
     val password: String
 )
 
+// Request DTO
 data class LoginRequest(
     @field:NotBlank(message = "Email tidak boleh kosong")
     @field:Email(message = "Format email tidak valid")
@@ -26,6 +28,7 @@ data class LoginRequest(
     val password: String
 )
 
+// Response DTO
 data class AuthResponse(
     val token: String,
     val tokenType: String = "Bearer",

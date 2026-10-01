@@ -5,6 +5,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.*
 import org.springframework.stereotype.Service
 
+// Loads a user for login checks; role becomes ROLE_<role>
 @Service
 class UserService(private val userRepository: UserRepository) : UserDetailsService {
     override fun loadUserByUsername(email: String): UserDetails {
