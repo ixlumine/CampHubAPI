@@ -80,7 +80,7 @@ class GlobalExceptionHandler {
         return build(HttpStatus.FORBIDDEN, "Akses ditolak", req)
     }
 
-    // Backup only: services check relations and duplicates first (spec 5.4)
+    // Fallback only: services check relations and duplicates first
     @ExceptionHandler(DataIntegrityViolationException::class)
     fun handleDataIntegrity(
         ex: DataIntegrityViolationException,
