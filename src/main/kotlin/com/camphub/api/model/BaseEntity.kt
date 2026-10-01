@@ -3,10 +3,12 @@ package com.camphub.api.model
 import jakarta.persistence.*
 import org.hibernate.Hibernate
 
+// Shared id for all entities
 @MappedSuperclass
 abstract class BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null
 
+    // Compare by id; works with Hibernate proxies
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null) return false

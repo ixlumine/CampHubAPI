@@ -10,6 +10,7 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.stereotype.Component
 
+// 403 response in the same JSON format as other errors
 @Component
 class RestAccessDeniedHandler(private val mapper: ObjectMapper) : AccessDeniedHandler {
     override fun handle(

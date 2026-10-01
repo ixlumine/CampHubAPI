@@ -10,6 +10,7 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.stereotype.Component
 
+// 401 response in the same JSON format as other errors
 @Component
 class RestAuthEntryPoint(private val mapper: ObjectMapper) : AuthenticationEntryPoint {
     override fun commence(

@@ -8,6 +8,7 @@ import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
+// Register and login; no token needed
 @RestController
 @RequestMapping("/api/auth")
 class AuthController(private val service: AuthService) {
