@@ -39,7 +39,7 @@ class SecurityConfig(
                 // Role rules; ownership is checked in services
                 it.requestMatchers(HttpMethod.POST, "/api/bootcamps").hasRole("PROVIDER")
                 it.requestMatchers(HttpMethod.POST, "/api/bootcamps/*/programs").hasRole("PROVIDER")
-                it.requestMatchers(HttpMethod.POST, "/api/programs/*/reviews").hasRole("USER")
+                it.requestMatchers(HttpMethod.POST, "/api/bootcamps/*/reviews").hasRole("USER")
                 it.requestMatchers(HttpMethod.POST, "/api/threads").hasAnyRole("USER", "PROVIDER")
                 it.requestMatchers(HttpMethod.POST, "/api/threads/*/comments").hasAnyRole("USER", "PROVIDER")
                 // Everything else requires login
