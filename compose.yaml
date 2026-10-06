@@ -7,7 +7,7 @@ services:
       MYSQL_USER: ${DB_USERNAME:-camphub_user}
       MYSQL_PASSWORD: ${DB_PASSWORD:-camphub_dev_password}
     ports:
-      - "127.0.0.1:3306:3306"
+      - "127.0.0.1:${DB_PORT:-3306}:3306"
     volumes:
       - camphub_data:/var/lib/mysql
     healthcheck:

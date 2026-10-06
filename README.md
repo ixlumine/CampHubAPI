@@ -6,7 +6,7 @@ Spring Boot 3.5 + Kotlin, MySQL, autentikasi JWT.
 ## Prasyarat
 
 - JDK 17
-- Salah satu database: MySQL (disarankan 9.7), XAMPP (MariaDB), atau Docker Desktop
+- Salah satu database: MySQL (disarankan 9.7), XAMPP, Laragon, atau Docker Desktop
 - Gradle tidak perlu di-install (sudah ada Gradle wrapper)
 
 ## Konfigurasi
@@ -23,26 +23,21 @@ File `.env` tidak boleh di-commit.
 | `JWT_SECRET` | (string contoh) | Kunci tanda tangan token, minimal 32 karakter |
 | `ADMIN_PASSWORD` | `admin_dev_password` | Password akun admin contoh |
 
-`./gradlew bootRun` tidak membaca `.env` secara otomatis. Di WSL/Linux/Mac, muat dulu isinya:
-
-```bash
-set -a && source .env && set +a && ./gradlew bootRun
-```
-
-Di Windows PowerShell, isi variabel satu per satu, contoh:
-`$env:DB_PASSWORD="passwordku"; .\gradlew.bat bootRun`
+Backend membaca `.env` dari folder project secara otomatis, tanpa `export`.
+Format `.env`: satu pengaturan per baris, tanpa tanda kutip dan tanpa `export`; komentar di baris sendiri.
+Isi `JWT_SECRET` dengan nilai acak sendiri, misalnya hasil `openssl rand -hex 32`.
 
 ## Cara menjalankan
 
-### Cara A: MySQL native atau XAMPP
+### Cara A: MySQL native, XAMPP, atau Laragon
 
-1. Jalankan SQL berikut sekali (MySQL Workbench, phpMyAdmin, atau terminal):
-```sql
-   CREATE DATABASE camphub_db;
-   CREATE USER 'camphub_user'@'localhost' IDENTIFIED BY 'camphub_dev_password';
-   GRANT ALL PRIVILEGES ON camphub_db.* TO 'camphub_user'@'localhost';
+1. Salin `.env.example` menjadi `.env`, lalu isi port dan login MySQL. Contoh XAMPP/Laragon dengan root tanpa password:
 ```
-2. Jalankan backend:
+   DB_PORT=3306
+   DB_USERNAME=root
+   DB_PASSWORD=
+```
+2. Jalankan backend. Database `camphub_db` dibuat otomatis.
 ```bash
    ./gradlew bootRun        # Windows: gradlew.bat bootRun
 ```
@@ -61,7 +56,7 @@ docker compose ps          # tunggu status db menjadi healthy
 ./gradlew bootRun
 ```
 
-Jika port 3306 sudah terpakai (misalnya XAMPP menyala), isi `DB_PORT=3307` di `.env`, lalu jalankan cara C dengan `.env` yang sudah dimuat.
+Jika port 3306 sudah terpakai (misalnya XAMPP menyala), isi `DB_PORT=3307` di `.env`.
 
 Tabel dibuat otomatis saat aplikasi start, dan data contoh diisi oleh seeder hanya jika tabel masih kosong.
 
