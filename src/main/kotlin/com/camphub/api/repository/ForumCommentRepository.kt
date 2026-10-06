@@ -4,5 +4,6 @@ import com.camphub.api.model.ForumComment
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface ForumCommentRepository : JpaRepository<ForumComment, Long> {
-    fun findByPostIdOrderByIdAsc(postId: Long): List<ForumComment>
+    fun findByThreadIdOrderByIdAsc(threadId: Long): List<ForumComment>
+    fun countByThreadId(threadId: Long): Long
 }

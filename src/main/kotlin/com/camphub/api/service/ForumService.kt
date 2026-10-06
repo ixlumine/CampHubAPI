@@ -5,80 +5,88 @@ import com.camphub.api.exception.ForbiddenException
 import com.camphub.api.exception.NotFoundException
 import com.camphub.api.exception.UnauthorizedException
 import com.camphub.api.model.ForumComment
-import com.camphub.api.model.ForumPost
+import com.camphub.api.model.ForumThread
 import com.camphub.api.model.Role
 import com.camphub.api.model.User
 import com.camphub.api.repository.ForumCommentRepository
-import com.camphub.api.repository.ForumPostRepository
+import com.camphub.api.repository.ForumThreadRepository
 import com.camphub.api.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class ForumService(
-    private val forumPostRepository: ForumPostRepository,
+    private val forumThreadRepository: ForumThreadRepository,
     private val forumCommentRepository: ForumCommentRepository,
     private val userRepository: UserRepository
 ) {
     @Transactional(readOnly = true)
-    fun listPosts(): List<ForumPostDto> {
-        return forumPostRepository.findAllByOrderByIdDesc().map { post ->
-            val count = forumCommentRepository.findByPostIdOrderByIdAsc(post.id!!).size
-            post.toDto(count)
+    fun listThreads(): List<ForumThreadDto> {
+        return forumThreadRepository.findAllByOrderByIdDesc().map { thread ->
+            val count = forumCommentRepository.countByThreadId(thread.id!!).toInt()
+            thread.toDto(count)
         }
     }
 
     @Transactional(readOnly = true)
-    fun getPostDetail(postId: Long): Pair<ForumPostDto, List<ForumCommentDto>> {
-        val post = findPost(postId)
-        val comments = forumCommentRepository.findByPostIdOrderByIdAsc(postId).map { it.toDto() }
-        return Pair(post.toDto(comments.size), comments)
+    fun getThread(threadId: Long): ForumThreadDto {
+        val thread = findThread(threadId)
+        val count = forumCommentRepository.countByThreadId(threadId).toInt()
+        return thread.toDto(count)
+    }
+
+    @Transactional(readOnly = true)
+    fun listComments(threadId: Long): List<ForumCommentDto> {
+        findThread(threadId)
+        return forumCommentRepository.findByThreadIdOrderByIdAsc(threadId).map { it.toDto() }
     }
 
     @Transactional
-    fun createPost(req: CreateForumPostRequest, email: String): ForumPostDto {
-        val post = ForumPost().apply {
+    fun createThread(req: CreateForumThreadRequest, email: String): ForumThreadDto {
+        val thread = ForumThread().apply {
             title = req.title.trim()
             content = req.content.trim()
-            user = currentUser(email)
+            author = currentUser(email)
+            createdAt = LocalDateTime.now()
         }
-        forumPostRepository.save(post)
-        return post.toDto(0)
+        forumThreadRepository.save(thread)
+        return thread.toDto(0)
     }
 
     @Transactional
-    fun updatePost(postId: Long, req: CreateForumPostRequest, email: String): ForumPostDto {
-        val post = findPost(postId)
+    fun updateThread(threadId: Long, req: CreateForumThreadRequest, email: String): ForumThreadDto {
+        val thread = findThread(threadId)
         val user = currentUser(email)
-        if (post.user.id != user.id && user.role != Role.ADMIN) {
-            throw ForbiddenException("Hanya pembuat diskusi atau admin yang dapat mengubah postingan ini")
+        if (thread.author.id != user.id) {
+            throw ForbiddenException("Hanya pembuat thread yang dapat mengubah thread ini")
         }
-        post.title = req.title.trim()
-        post.content = req.content.trim()
-        val count = forumCommentRepository.findByPostIdOrderByIdAsc(postId).size
-        return post.toDto(count)
+        thread.title = req.title.trim()
+        thread.content = req.content.trim()
+        val count = forumCommentRepository.countByThreadId(threadId).toInt()
+        return thread.toDto(count)
     }
 
     @Transactional
-    fun deletePost(postId: Long, email: String) {
-        val post = findPost(postId)
+    fun deleteThread(threadId: Long, email: String) {
+        val thread = findThread(threadId)
         val user = currentUser(email)
-        if (post.user.id != user.id && user.role != Role.ADMIN) {
-            throw ForbiddenException("Hanya pembuat diskusi atau admin yang dapat menghapus postingan ini")
+        if (thread.author.id != user.id && user.role != Role.ADMIN) {
+            throw ForbiddenException("Hanya pembuat thread atau admin yang dapat menghapus thread ini")
         }
-        // Delete associated comments first or let cascade handle it if configured, but safe to delete manually:
-        val comments = forumCommentRepository.findByPostIdOrderByIdAsc(postId)
+        val comments = forumCommentRepository.findByThreadIdOrderByIdAsc(threadId)
         forumCommentRepository.deleteAll(comments)
-        forumPostRepository.delete(post)
+        forumThreadRepository.delete(thread)
     }
 
     @Transactional
-    fun addComment(postId: Long, req: CreateForumCommentRequest, email: String): ForumCommentDto {
-        val post = findPost(postId)
+    fun addComment(threadId: Long, req: CreateForumCommentRequest, email: String): ForumCommentDto {
+        val thread = findThread(threadId)
         val comment = ForumComment().apply {
-            this.post = post
-            this.user = currentUser(email)
+            this.thread = thread
+            this.author = currentUser(email)
             content = req.content.trim()
+            createdAt = LocalDateTime.now()
         }
         forumCommentRepository.save(comment)
         return comment.toDto()
@@ -89,15 +97,14 @@ class ForumService(
         val comment = forumCommentRepository.findById(commentId)
             .orElseThrow { NotFoundException("Komentar id=$commentId tidak ditemukan") }
         val user = currentUser(email)
-        // Author of comment, author of post, or admin can delete
-        if (comment.user.id != user.id && comment.post.user.id != user.id && user.role != Role.ADMIN) {
+        if (comment.author.id != user.id && user.role != Role.ADMIN) {
             throw ForbiddenException("Anda tidak memiliki izin untuk menghapus komentar ini")
         }
         forumCommentRepository.delete(comment)
     }
 
-    private fun findPost(id: Long): ForumPost =
-        forumPostRepository.findById(id).orElseThrow { NotFoundException("Diskusi forum id=$id tidak ditemukan") }
+    private fun findThread(id: Long): ForumThread =
+        forumThreadRepository.findById(id).orElseThrow { NotFoundException("Thread id=$id tidak ditemukan") }
 
     private fun currentUser(email: String): User =
         userRepository.findByEmail(email) ?: throw UnauthorizedException()

@@ -9,46 +9,46 @@ import org.springframework.security.core.userdetails.User as SpringUser
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/forum")
+@RequestMapping("/api")
 class ForumController(private val service: ForumService) {
 
-    @GetMapping("/posts")
-    fun listPosts(): List<ForumPostDto> = service.listPosts()
+    @GetMapping("/threads")
+    fun listThreads(): List<ForumThreadDto> = service.listThreads()
 
-    @GetMapping("/posts/{id}")
-    fun getPostDetail(@PathVariable id: Long): Map<String, Any> {
-        val (post, comments) = service.getPostDetail(id)
-        return mapOf("post" to post, "comments" to comments)
-    }
+    @GetMapping("/threads/{id}")
+    fun getThread(@PathVariable id: Long): ForumThreadDto = service.getThread(id)
 
-    @PostMapping("/posts")
+    @PostMapping("/threads")
     @ResponseStatus(HttpStatus.CREATED)
-    fun createPost(
-        @Valid @RequestBody req: CreateForumPostRequest,
+    fun createThread(
+        @Valid @RequestBody req: CreateForumThreadRequest,
         @AuthenticationPrincipal principal: SpringUser
-    ): ForumPostDto = service.createPost(req, principal.username)
+    ): ForumThreadDto = service.createThread(req, principal.username)
 
-    @PutMapping("/posts/{id}")
-    fun updatePost(
+    @PutMapping("/threads/{id}")
+    fun updateThread(
         @PathVariable id: Long,
-        @Valid @RequestBody req: CreateForumPostRequest,
+        @Valid @RequestBody req: CreateForumThreadRequest,
         @AuthenticationPrincipal principal: SpringUser
-    ): ForumPostDto = service.updatePost(id, req, principal.username)
+    ): ForumThreadDto = service.updateThread(id, req, principal.username)
 
-    @DeleteMapping("/posts/{id}")
+    @DeleteMapping("/threads/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deletePost(
+    fun deleteThread(
         @PathVariable id: Long,
         @AuthenticationPrincipal principal: SpringUser
-    ) = service.deletePost(id, principal.username)
+    ) = service.deleteThread(id, principal.username)
 
-    @PostMapping("/posts/{postId}/comments")
+    @GetMapping("/threads/{id}/comments")
+    fun listComments(@PathVariable id: Long): List<ForumCommentDto> = service.listComments(id)
+
+    @PostMapping("/threads/{threadId}/comments")
     @ResponseStatus(HttpStatus.CREATED)
     fun addComment(
-        @PathVariable postId: Long,
+        @PathVariable threadId: Long,
         @Valid @RequestBody req: CreateForumCommentRequest,
         @AuthenticationPrincipal principal: SpringUser
-    ): ForumCommentDto = service.addComment(postId, req, principal.username)
+    ): ForumCommentDto = service.addComment(threadId, req, principal.username)
 
     @DeleteMapping("/comments/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
