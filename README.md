@@ -11,8 +11,8 @@ Spring Boot 3.5 + Kotlin, MySQL, autentikasi JWT.
 
 ## Konfigurasi
 
-Semua konfigurasi punya nilai default di `application.properties`, jadi project bisa langsung jalan.
-Untuk mengganti nilai, salin `.env.example` menjadi `.env`, lalu ubah yang perlu.
+Nilai default di `application.properties` sesuai Docker (Cara B dan C).
+Untuk XAMPP, Laragon, atau MySQL native, salin `.env.example` menjadi `.env`, lalu ubah yang perlu (Cara A).
 File `.env` tidak boleh di-commit.
 
 | Variabel | Default | Keterangan |
@@ -20,6 +20,7 @@ File `.env` tidak boleh di-commit.
 | `DB_PORT` | `3306` | Port MySQL |
 | `DB_USERNAME` | `camphub_user` | User database |
 | `DB_PASSWORD` | `camphub_dev_password` | Password database |
+| `MYSQL_ROOT_PASSWORD` | `root_dev_password` | Password root MySQL di Docker |
 | `JWT_SECRET` | (string contoh) | Kunci tanda tangan token, minimal 32 karakter |
 | `ADMIN_PASSWORD` | `admin_dev_password` | Password akun admin contoh |
 
