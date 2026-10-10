@@ -12,6 +12,7 @@ import com.camphub.api.model.Role
 import com.camphub.api.model.User
 import com.camphub.api.repository.BootcampRepository
 import com.camphub.api.repository.ProgramRepository
+import com.camphub.api.repository.ReviewRepository
 import com.camphub.api.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 class BootcampService(
     private val bootcampRepository: BootcampRepository,
     private val programRepository: ProgramRepository,
+    private val reviewRepository: ReviewRepository,
     private val userRepository: UserRepository
 ) {
     @Transactional(readOnly = true)
@@ -69,6 +71,9 @@ class BootcampService(
         }
         if (programRepository.existsByBootcampId(id)) {
             throw BadRequestException("Bootcamp tidak dapat dihapus karena masih memiliki program")
+        }
+        if (reviewRepository.existsByBootcampId(id)) {
+            throw BadRequestException("Bootcamp tidak dapat dihapus karena masih memiliki ulasan")
         }
         bootcampRepository.delete(b)
     }
