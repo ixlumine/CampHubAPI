@@ -4,6 +4,7 @@ Backend REST API aplikasi CampHub.
 
 - **Teknologi:** Spring Boot 3.5.16, Kotlin 1.9.25, Java 17, MySQL, JWT
 - **Aplikasi Android:** repository [CampHub](https://github.com/ixlumine/CampHub)
+- **Dokumentasi:** [Arsitektur](docs/ARCHITECTURE.md), [Postman](postman/README.md)
 
 ## Struktur
 
@@ -96,42 +97,37 @@ Dibuat oleh seed data saat database masih kosong. Hanya untuk development.
 
 ## Endpoint
 
-| Diakses dari | Base URL |
-|---|---|
-| Postman | `http://127.0.0.1:8080` |
-| Emulator | `http://10.0.2.2:8080` |
-| HP via USB | `http://127.0.0.1:8080` setelah `adb reverse tcp:8080 tcp:8080` |
+Base URL:
+- Postman: `http://127.0.0.1:8080`
+- Emulator: `http://10.0.2.2:8080`
+- HP via USB: `http://127.0.0.1:8080` setelah `adb reverse tcp:8080 tcp:8080`
 
 Semua endpoint kecuali `/api/auth/**` membutuhkan header `Authorization: Bearer <token>`. Token berlaku 24 jam.
 
-| Method | Path | Akses |
-|---|---|---|
-| POST | `/api/auth/register` | Publik |
-| POST | `/api/auth/login` | Publik |
-| GET | `/api/bootcamps` | Login |
-| GET | `/api/bootcamps/{id}` | Login |
-| POST | `/api/bootcamps` | PROVIDER |
-| PUT | `/api/bootcamps/{id}` | Pemilik |
-| DELETE | `/api/bootcamps/{id}` | Pemilik, ADMIN |
-| GET | `/api/bootcamps/{id}/programs` | Login |
-| GET | `/api/programs/{id}` | Login |
-| POST | `/api/bootcamps/{id}/programs` | Pemilik bootcamp |
-| PUT | `/api/programs/{id}` | Pemilik bootcamp |
-| DELETE | `/api/programs/{id}` | Pemilik bootcamp, ADMIN |
-| GET | `/api/bootcamps/{id}/reviews` | Login |
-| POST | `/api/bootcamps/{id}/reviews` | USER |
-| PUT | `/api/reviews/{id}` | Pemilik |
-| DELETE | `/api/reviews/{id}` | Pemilik, ADMIN |
-| GET | `/api/bootcamps/{id}/review-summary` | Login |
-| GET | `/api/rankings` | Login |
-| GET | `/api/threads` | Login |
-| GET | `/api/threads/{id}` | Login |
-| POST | `/api/threads` | USER, PROVIDER |
-| PUT | `/api/threads/{id}` | Pemilik |
-| DELETE | `/api/threads/{id}` | Pemilik, ADMIN |
-| GET | `/api/threads/{id}/comments` | Login |
-| POST | `/api/threads/{id}/comments` | USER, PROVIDER |
-| DELETE | `/api/comments/{id}` | Pemilik, ADMIN |
+Pengujian dengan Postman ada di [postman/README.md](postman/README.md).
+
+| Path | GET | POST | PUT | DELETE |
+|---|---|---|---|---|
+| `/api/auth/register` | — | Tanpa token | — | — |
+| `/api/auth/login` | — | Tanpa token | — | — |
+| `/api/bootcamps` | Semua role | PROVIDER | — | — |
+| `/api/bootcamps/{id}` | Semua role | — | PROVIDER | PROVIDER, ADMIN |
+| `/api/bootcamps/{id}/programs` | Semua role | PROVIDER | — | — |
+| `/api/programs/{id}` | Semua role | — | PROVIDER | PROVIDER, ADMIN |
+| `/api/bootcamps/{id}/reviews` | Semua role | USER | — | — |
+| `/api/reviews/{id}` | — | — | USER | USER, ADMIN |
+| `/api/bootcamps/{id}/review-summary` | Semua role | — | — | — |
+| `/api/rankings` | Semua role | — | — | — |
+| `/api/threads` | Semua role | USER, PROVIDER | — | — |
+| `/api/threads/{id}` | Semua role | — | USER, PROVIDER | USER, PROVIDER, ADMIN |
+| `/api/threads/{id}/comments` | Semua role | USER, PROVIDER | — | — |
+| `/api/comments/{id}` | — | — | — | USER, PROVIDER, ADMIN |
+
+Aturan tambahan:
+- **Semua role**: USER, PROVIDER, dan ADMIN.
+- **PUT dan DELETE** oleh USER atau PROVIDER hanya untuk data yang dibuat oleh akun yang sedang login. ADMIN dapat menghapus semua data.
+- **Program**: tambah, ubah, dan hapus hanya oleh PROVIDER yang membuat bootcamp tersebut.
+- **Ulasan**: satu USER hanya dapat menulis satu ulasan untuk setiap bootcamp.
 
 Contoh login:
 ```bash
