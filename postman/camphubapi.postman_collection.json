@@ -1,0 +1,1240 @@
+{
+  "info": {
+    "name": "CampHubAPI",
+    "description": "Berisi 28 request untuk menguji semua endpoint CampHubAPI. Panduan lengkap ada di `postman/README.md` pada repository.\n\nSebelum menjalankan:\n1. Jalankan backend (lihat README).\n2. Jika backend tidak berjalan di `http://127.0.0.1:8080`, ubah variabel `baseUrl` di tab Variables.\n\nFolder Autentikasi harus dijalankan lebih dulu, karena request di folder ini mengambil token login. Token dan ID data yang dibuat disimpan otomatis ke variabel collection, lalu dipakai oleh request berikutnya.\n\nAkun yang dipakai: USER rina@example.com, PROVIDER kodenusantara@example.com, ADMIN admin@example.com, serta satu akun baru dari request Register. Request memakai token USER, kecuali yang diatur lain di tab Authorization request tersebut.\n\nBootcamp, program, ulasan, pertanyaan, dan komentar yang dibuat selama pengujian dihapus kembali di akhir folder masing-masing. Akun dari request Register tidak dihapus.\n\nSetiap request dicek kode statusnya. Hak akses setiap endpoint ada di README bagian Endpoint.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{tokenUser}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Autentikasi",
+      "description": "Register dan login. Token disimpan ke variabel collection untuk dipakai folder lain.",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('tokenNewUser', pm.response.json().token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Tanpa token. Membuat akun USER baru dengan email unik. Token akun ini disimpan ke `tokenNewUser`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pengguna Baru\",\n  \"email\": \"user{{$timestamp}}@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login USER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) { pm.collectionVariables.set('tokenUser', pm.response.json().token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Tanpa token. Login dengan rina@example.com (USER). Token disimpan ke `tokenUser`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"rina@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login PROVIDER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) { pm.collectionVariables.set('tokenProvider', pm.response.json().token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Tanpa token. Login dengan kodenusantara@example.com (PROVIDER). Token disimpan ke `tokenProvider`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"kodenusantara@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login ADMIN",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) { pm.collectionVariables.set('tokenAdmin', pm.response.json().token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Tanpa token. Login dengan admin@example.com (ADMIN). Password diambil dari variabel `adminPassword`. Token disimpan ke `tokenAdmin`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "auth": {
+        "type": "noauth"
+      }
+    },
+    {
+      "name": "Katalog",
+      "description": "Bootcamp dan program. Bootcamp dan program dibuat dengan token PROVIDER, lalu dihapus di akhir folder.",
+      "item": [
+        {
+          "name": "Lihat semua bootcamp",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) { pm.collectionVariables.set('reviewBootcampId', pm.response.json().length > 0 ? pm.response.json()[0].id : ''); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Token USER. Menampilkan semua bootcamp. ID bootcamp pertama disimpan ke `reviewBootcampId` untuk folder Ulasan dan Peringkat.",
+            "url": {
+              "raw": "{{baseUrl}}/api/bootcamps",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bootcamps"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Tambah bootcamp",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('bootcampId', pm.response.json().id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Token PROVIDER. Membuat bootcamp untuk pengujian. ID-nya disimpan ke `bootcampId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/bootcamps",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bootcamps"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenProvider}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bootcamp Uji\",\n  \"description\": \"Deskripsi bootcamp uji\",\n  \"location\": \"Surabaya\",\n  \"website\": \"https://example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Lihat detail bootcamp",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Token USER. Menampilkan bootcamp `bootcampId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/bootcamps/{{bootcampId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bootcamps",
+                "{{bootcampId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ubah bootcamp",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Token PROVIDER. Mengubah bootcamp `bootcampId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/bootcamps/{{bootcampId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bootcamps",
+                "{{bootcampId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenProvider}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bootcamp Uji (ubah)\",\n  \"description\": \"Deskripsi bootcamp uji\",\n  \"location\": \"Surabaya\",\n  \"website\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Tambah program",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('programId', pm.response.json().id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Token PROVIDER. Menambah program ke bootcamp `bootcampId`. ID-nya disimpan ke `programId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/bootcamps/{{bootcampId}}/programs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bootcamps",
+                "{{bootcampId}}",
+                "programs"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenProvider}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Program Uji\",\n  \"category\": \"Web Development\",\n  \"price\": 10000000,\n  \"durationWeeks\": 12,\n  \"syllabus\": \"Minggu 1-2: Dasar\",\n  \"registrationOpen\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Lihat program bootcamp",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Token USER. Menampilkan program bootcamp `bootcampId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/bootcamps/{{bootcampId}}/programs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bootcamps",
+                "{{bootcampId}}",
+                "programs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Lihat detail program",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Token USER. Menampilkan program `programId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/programs/{{programId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "programs",
+                "{{programId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ubah program",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Token PROVIDER. Mengubah program `programId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/programs/{{programId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "programs",
+                "{{programId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenProvider}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Program Uji (ubah)\",\n  \"category\": \"Web Development\",\n  \"price\": 12000000,\n  \"durationWeeks\": 10,\n  \"syllabus\": \"Minggu 1-2: Dasar\",\n  \"registrationOpen\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Hapus program",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "description": "Token PROVIDER. Menghapus program `programId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/programs/{{programId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "programs",
+                "{{programId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenProvider}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Hapus bootcamp",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "description": "Token PROVIDER. Menghapus bootcamp `bootcampId`. Bootcamp yang masih memiliki program atau ulasan tidak bisa dihapus, jadi request ini dijalankan setelah Hapus program.",
+            "url": {
+              "raw": "{{baseUrl}}/api/bootcamps/{{bootcampId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bootcamps",
+                "{{bootcampId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenProvider}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ulasan dan Peringkat",
+      "description": "Ulasan, ringkasan ulasan, dan peringkat. Ulasan ditulis dengan token akun dari request Register, karena satu USER hanya dapat menulis satu ulasan untuk setiap bootcamp. Ulasan dihapus dengan token ADMIN di akhir folder.",
+      "item": [
+        {
+          "name": "Lihat ulasan bootcamp",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Token USER. Menampilkan ulasan bootcamp `reviewBootcampId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/bootcamps/{{reviewBootcampId}}/reviews",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bootcamps",
+                "{{reviewBootcampId}}",
+                "reviews"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Tambah ulasan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('reviewId', pm.response.json().id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Token akun dari request Register. Menulis ulasan untuk bootcamp `reviewBootcampId`. ID-nya disimpan ke `reviewId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/bootcamps/{{reviewBootcampId}}/reviews",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bootcamps",
+                "{{reviewBootcampId}}",
+                "reviews"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenNewUser}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4,\n  \"content\": \"Isi ulasan uji\",\n  \"careerStatus\": \"SEEKING_JOB\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Ubah ulasan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Token akun dari request Register. Mengubah ulasan `reviewId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/{{reviewId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reviews",
+                "{{reviewId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenNewUser}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"content\": \"Isi ulasan uji (ubah)\",\n  \"careerStatus\": \"EMPLOYED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Lihat ringkasan ulasan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Token USER. Menampilkan rata-rata rating, jumlah ulasan, dan jumlah ulasan per status karier untuk bootcamp `reviewBootcampId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/bootcamps/{{reviewBootcampId}}/review-summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bootcamps",
+                "{{reviewBootcampId}}",
+                "review-summary"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Lihat peringkat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Token USER. Menampilkan peringkat bootcamp dengan minimal 3 ulasan.",
+            "url": {
+              "raw": "{{baseUrl}}/api/rankings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rankings"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Hapus ulasan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "description": "Token ADMIN. Menghapus ulasan `reviewId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/{{reviewId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reviews",
+                "{{reviewId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Forum",
+      "description": "Pertanyaan dan komentar. Pertanyaan dibuat dengan token USER, komentar dengan token PROVIDER. Keduanya dihapus di akhir folder.",
+      "item": [
+        {
+          "name": "Lihat semua pertanyaan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Token USER. Menampilkan semua pertanyaan.",
+            "url": {
+              "raw": "{{baseUrl}}/api/threads",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "threads"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Tambah pertanyaan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('threadId', pm.response.json().id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Token USER. Membuat pertanyaan untuk pengujian. ID-nya disimpan ke `threadId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/threads",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "threads"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Pertanyaan uji\",\n  \"content\": \"Isi pertanyaan uji\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Lihat detail pertanyaan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Token USER. Menampilkan pertanyaan `threadId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/threads/{{threadId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "threads",
+                "{{threadId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ubah pertanyaan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Token USER. Mengubah pertanyaan `threadId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/threads/{{threadId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "threads",
+                "{{threadId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Pertanyaan uji (ubah)\",\n  \"content\": \"Isi pertanyaan uji\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Tambah komentar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('commentId', pm.response.json().id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Token PROVIDER. Menambah komentar ke pertanyaan `threadId`. ID-nya disimpan ke `commentId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/threads/{{threadId}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "threads",
+                "{{threadId}}",
+                "comments"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenProvider}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Isi komentar uji\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Lihat komentar pertanyaan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Token USER. Menampilkan komentar pertanyaan `threadId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/threads/{{threadId}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "threads",
+                "{{threadId}}",
+                "comments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Hapus komentar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "description": "Token PROVIDER. Menghapus komentar `commentId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/comments/{{commentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "comments",
+                "{{commentId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenProvider}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Hapus pertanyaan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "description": "Token USER. Menghapus pertanyaan `threadId`.",
+            "url": {
+              "raw": "{{baseUrl}}/api/threads/{{threadId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "threads",
+                "{{threadId}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8080"
+    },
+    {
+      "key": "adminPassword",
+      "value": "admin_dev_password"
+    },
+    {
+      "key": "tokenUser",
+      "value": ""
+    },
+    {
+      "key": "tokenProvider",
+      "value": ""
+    },
+    {
+      "key": "tokenAdmin",
+      "value": ""
+    },
+    {
+      "key": "tokenNewUser",
+      "value": ""
+    },
+    {
+      "key": "reviewBootcampId",
+      "value": ""
+    },
+    {
+      "key": "bootcampId",
+      "value": ""
+    },
+    {
+      "key": "programId",
+      "value": ""
+    },
+    {
+      "key": "reviewId",
+      "value": ""
+    },
+    {
+      "key": "threadId",
+      "value": ""
+    },
+    {
+      "key": "commentId",
+      "value": ""
+    }
+  ]
+}
